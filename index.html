@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crucigrama Místico</title>
+<style>
+  body {
+    background: #1a1a1a;
+    color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: justify;
+    line-height: 1.6;
+  }
+  h1, h2 {
+    color: pink;
+    text-align: center;
+  }
+  .instrucciones {
+    border: 1px solid pink;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  .crucigrama {
+    margin-bottom: 2rem;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.2rem;
+  }
+  .row-number {
+    color: pink;
+    width: 1.5rem;
+    text-align: right;
+    margin-right: 0.5rem;
+    font-weight: bold;
+  }
+  .row input {
+    width: 1.5rem;
+    height: 1.5rem;
+    background: #2c2c2c;
+    border: 1px solid pink;
+    color: #f5f5f5;
+    text-align: center;
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+  .row input.incorrect {
+    background: #ff0055;
+    color: white;
+  }
+  .pistas {
+    text-align: left;
+    border-top: 1px solid pink;
+    padding-top: 1rem;
+    margin-bottom: 2rem;
+  }
+  .button-container {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  .continue-btn {
+    background: pink;
+    color: #1a1a1a;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
+  .continue-btn:hover {
+    background: #ff99c8;
+  }
+  .hidden {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Crucigrama</h1>
+<div class="instrucciones">
+  Antes de avanzar, tenes que resolver este crucigrama. Cada palabra oculta representa un concepto que habita entre el tarot, la astrología y el mundo místico. No es solo un juego: es un recorrido para que despiertes la curiosidad, cuestiones lo que creías saber y conectes piezas que a veces no se ven a simple vista. Me dijiste que te gusta que te enseñe y acá me tenes &lt;3<br><br>
+  Lee atentamente las pistas que se encuentran a continuación. Si no conocés la respuesta, investigá, cuestioná, buscá (sé que sos muy bueno para eso). Solo cuando logres completar correctamente todo el crucigrama, se desbloqueará el siguiente paso.
+</div>
+
+<div class="crucigrama" id="crucigrama"></div>
+
+<h2>Pistas</h2>
+<div class="pistas">
+  <ol>
+    <li>Carta que representa el renacimiento y la transformación.</li>
+    <li>Arquetipo asociado a la introspección y la búsqueda interna.</li>
+    <li>Figura que representa la tentación y el deseo encadenante.</li>
+    <li>Carta que simboliza estructuras que colapsan para dejar lugar a lo nuevo.</li>
+    <li>Símbolo del equilibrio, la armonía y la justicia.</li>
+    <li>Representa el inconsciente, los miedos y los secretos.</li>
+    <li>Figura femenina vinculada a la fertilidad y la abundancia.</li>
+    <li>Signo que representa el fuego, el liderazgo y el ego.</li>
+    <li>Planeta asociado al amor y la belleza.</li>
+    <li>Astro que representa el inconsciente y las emociones.</li>
+    <li>Signo de aire, amante del equilibrio y la armonía.</li>
+    <li>Planeta asociado a la comunicación y el pensamiento.</li>
+    <li>Signo de agua conocido por su intensidad y misterio.</li>
+    <li>Figura mitológica y astrológica vinculada a la rebeldía y la sombra femenina.</li>
+    <li>Ritual energético usado para atraer dulzura y armonía.</li>
+    <li>Trabajo espiritual para revertir situaciones.</li>
+    <li>Herramienta esotérica que responde preguntas mediante movimiento.</li>
+    <li>Acuerdo espiritual que marca destinos entre almas.</li>
+    <li>Teoría que sostiene que los pensamientos y emociones influyen en la realidad.</li>
+    <li>Ley que asegura que cada acción tiene su consecuencia espiritual.</li>
+    <li>Campo invisible que rodea y protege a la persona.</li>
+    <li>Seres que se alimentan de la energía vital ajena.</li>
+    <li>Símbolo poderoso que es clave en rituales antiguos y grimorios.</li>
+  </ol>
+</div>
+
+<div class="button-container hidden" id="nextButton">
+  <button class="continue-btn" id="goNext">Continuar</button>
+</div>
+
+<script>
+  const answers = [
+    "MUERTE","ERMITAÑO","DIABLO","TORRE","JUSTICIA","LUNA","EMPERATRIZ",
+    "LEO","VENUS","LUNA","LIBRA","MERCURIO","ESCORPIO","LILITH",
+    "AUTOENDULZAMIENTO","VOLTEO","PENDULO","CONTRATOALMICO","LEYDEATRACCION","KARMA","AURA","PARASITOSENERGETICOS","TETRAGRAMMATON"
+  ];
+  const crucigrama = document.getElementById('crucigrama');
+  answers.forEach((word, wIndex) => {
+    const row = document.createElement('div')
+    row.classList.add('row')
+    const num = document.createElement('div')
+    num.classList.add('row-number')
+    num.innerText = wIndex + 1
+    row.appendChild(num)
+    for (let i = 0; i < word.length; i++) {
+      const inp = document.createElement('input')
+      inp.maxLength = 1
+      inp.dataset.wIndex = wIndex
+      inp.dataset.lIndex = i
+      row.appendChild(inp)
+    }
+    crucigrama.appendChild(row)
+  });
+
+  const inputs = document.querySelectorAll('input')
+  inputs.forEach(inp => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.toUpperCase().slice(0,1)
+      if(inp.value){
+        let next = inp.nextElementSibling
+        while(next && next.tagName !== "INPUT") next = next.nextElementSibling
+        if(next) next.focus()
+      }
+      checkWords()
+    })
+    inp.addEventListener('keydown', e => {
+      if(e.key==="Backspace" && inp.value===""){
+        let prev = inp.previousElementSibling
+        while(prev && prev.tagName !== "INPUT") prev = prev.previousElementSibling
+        if(prev) prev.focus()
+      }
+    })
+  });
+
+  function checkWords(){
+    let correctWords = 0;
+    answers.forEach((word, wIndex)=>{
+      const wordInputs = Array.from(inputs).filter(i=>i.dataset.wIndex==wIndex)
+      const currentWord = wordInputs.map(i=>i.value).join("")
+      if(currentWord === word){
+        correctWords++
+        wordInputs.forEach(i=>i.classList.remove('incorrect'))
+      } else {
+        wordInputs.forEach(i=>{
+          if(currentWord.length===word.length && i.value!=="") i.classList.add('incorrect')
+          else i.classList.remove('incorrect')
+        })
+      }
+    })
+    if(correctWords===answers.length){
+      document.getElementById('nextButton').classList.remove('hidden')
+    }else{
+      document.getElementById('nextButton').classList.add('hidden')
+    }
+  }
+
+  document.getElementById('goNext').addEventListener('click', () => {
+    window.location.href = "mensaje/"
+  })
+</script>
+
+</body>
+</html>
